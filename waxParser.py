@@ -31,12 +31,12 @@ def readExport(file):
                 for l in lineList:
                     if l[1:].startswith(date):
                         correction = re.findall(timepattern,l[20:])
-                        if "kommen" in l.lower() and dct.workstart == None:
+                        if "kommen" in l.lower() or "beginn" in l.lower() and dct.workstart == None:
                             if  correction != []:
                                 dct.workstart = datetime.datetime.combine(datetime.datetime.strptime(l[1:9],'%d.%m.%y').date(),datetime.time(int(correction[0].split(':')[0]),int(correction[0].split(':')[1])))
                             else:
                                 dct.workstart = datetime.datetime.strptime(l[1:19],dayTimeP)
-                        elif "gehen" in l.lower() and dct.workend == None:
+                        elif "gehen" in l.lower() or "fertig" in l.lower() and dct.workend == None:
                             if  correction != []:
                                 dct.workend = datetime.datetime.combine(datetime.datetime.strptime(l[1:9],'%d.%m.%y').date(),datetime.time(int(correction[0].split(':')[0]),int(correction[0].split(':')[1])))
                             else:
