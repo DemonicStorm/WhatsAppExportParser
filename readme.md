@@ -14,3 +14,6 @@ following keywords need to be used:
 if you missed to check in, you can give the correct time with the according keyword in this format: "kommen 8:45". 
 Otherwise the Timestamp of the Message is used for the documentation.
 This Version includes only one possible break during the shift.
+
+# Use
+to use the script or .exe, paste a exported file in the same directory as script and exe, with the defaultname "_chat.txt"
