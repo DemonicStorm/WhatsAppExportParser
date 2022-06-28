@@ -1,7 +1,7 @@
 import datetime
 import re
 
-class daydict():
+class workday():
     def __init__(self):
         self.day = None
         self.workstart = None
@@ -11,6 +11,7 @@ class daydict():
         self.worktime = None
         self.breaktime = None
         self.total = None
+        self.misc = None
 
 timepattern = r'\d\d?:\d\d'
 dayTimeP = '%d.%m.%y, %H:%M:%S'
@@ -26,7 +27,7 @@ def readExport(file):
             date = line[1:9]
             if date not in dateCheckList:
                 dateCheckList.append(date)
-                dct = daydict()
+                dct = workday()
                 dct.day = datetime.datetime.strptime(date,'%d.%m.%y').date()
                 for l in lineList:
                     if l[1:].startswith(date):
@@ -36,6 +37,12 @@ def readExport(file):
                                 dct.workstart = datetime.datetime.combine(datetime.datetime.strptime(l[1:9],'%d.%m.%y').date(),datetime.time(int(correction[0].split(':')[0]),int(correction[0].split(':')[1])))
                             else:
                                 dct.workstart = datetime.datetime.strptime(l[1:19],dayTimeP)
+                            if "feiertag" in l.lower():
+                                dct.misc = "Feiertag"
+                            if "krank" in l.lower():
+                                dct.misc = "krank"
+                            if "urlaub" in l.lower():
+                                dct.misc = "Urlaub"
                         elif "gehen" in l.lower() or "fertig" in l.lower() and dct.workend == None:
                             if  correction != []:
                                 dct.workend = datetime.datetime.combine(datetime.datetime.strptime(l[1:9],'%d.%m.%y').date(),datetime.time(int(correction[0].split(':')[0]),int(correction[0].split(':')[1])))
@@ -109,7 +116,7 @@ def monthly(data):
             for x in summen[month]:
                 total.append(x.total.seconds)
             summe = sum(total)/60/60
-            print(f'{month}: {summe}')
+            print(f'{month}: {round(summe,2)}')
 
     return summen
 def ausgabe(monthlydata):
@@ -118,9 +125,9 @@ def ausgabe(monthlydata):
         if len(monthlydata[x]) > 0:
             file = "".join([x,'.csv'])
             with open(file,'w', encoding='utf-8') as f:
-                f.write('Datum,Arbeitssumme,Arbeitsbeginn,Arbeitsende,Pausenzeit\n')
-                [f.write(f'{monthlydata[x][i].day}, {monthlydata[x][i].total}, {monthlydata[x][i].workstart.time().strftime(pattern)}, {monthlydata[x][i].workend.time().strftime(pattern)}, {monthlydata[x][i].breaktime}\n') for i in range(len(monthlydata[x]))]
-                f.write(f'Monatssumme:, {sum([i.total.seconds for i in monthlydata[x]])/60/60}')
+                f.write('Datum,Arbeitssumme,Arbeitsbeginn,Arbeitsende,Pausenzeit,Urlaub/krank\n')
+                [f.write(f'{monthlydata[x][i].day}, {monthlydata[x][i].total}, {monthlydata[x][i].workstart.time().strftime(pattern)}, {monthlydata[x][i].workend.time().strftime(pattern)}, {monthlydata[x][i].breaktime}, {monthlydata[x][i].misc}\n') for i in range(len(monthlydata[x]))]
+                f.write(f'Monatssumme:, {round(sum([i.total.seconds for i in monthlydata[x]])/60/60,2)}')
 if __name__ == '__main__':
     ausgabe(monthly(readExport('_chat.txt')))
 
