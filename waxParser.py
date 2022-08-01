@@ -117,6 +117,8 @@ def monthly(data):
                 total.append(x.total.seconds)
             summe = sum(total)/60/60
             print(f'{month}: {round(summe,2)}')
+            with open('overview.csv',"a",encoding="utf-8") as f:
+                f.write(f'{month}: {round(summe,2)}\n')
 
     return summen
 def ausgabe(monthlydata):
